@@ -1,0 +1,124 @@
+
+<div class="top-nav">
+  <nav class="top-links">
+    <a href="/discover" routerLink="/discover" class="top-link">Discover</a>
+    <a href="/finance" routerLink="/finance" class="top-link">Finance</a>
+    <a href="/health" routerLink="/health" class="top-link">Health</a>
+    <a href="/academic" routerLink="/academic" class="top-link">Academic</a>
+    <a href="/patents" routerLink="/patents" class="top-link">Patents</a>
+  </nav>
+</div>
+
+<main class="home-main">
+  <h1 class="logo-text">perplexity</h1>
+
+  <div class="search-box" [class.focused]="isFocused()">
+    <div class="search-input-row">
+      <textarea
+        #searchInput
+        id="home-search-input"
+        class="search-textarea"
+        [value]="query()"
+        (input)="onInput($any($event.target).value)"
+        (keydown)="onKey($event)"
+        (focus)="focus()"
+        (blur)="blur()"
+        placeholder="Type / for search modes"
+        rows="1"
+        aria-label="Search anything"
+        aria-autocomplete="list"
+      ></textarea>
+    </div>
+
+    <div class="search-toolbar">
+      <div class="toolbar-left">
+        <button class="tool-btn attach-btn" title="Attach file" id="attach-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <button class="mode-pill" id="search-mode-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M21 21l-3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Search
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="mode-pill focus-pill" id="computer-mode-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 20h8M12 17v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Computer
+        </button>
+      </div>
+      <div class="toolbar-right">
+        
+        <div class="model-wrap">
+          <button class="model-btn" (click)="showModelMenu.update(v=>!v)" id="model-selector-btn">
+            Model
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          @if (showModelMenu()) {
+            <div class="model-dropdown">
+              @for (m of models; track m) {
+                <button class="model-option" [class.selected]="selectedModel()===m" (click)="selectModel(m)">
+                  {{ m }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <button class="tool-btn mic-btn" title="Voice input" id="mic-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M5 10a7 7 0 0014 0M12 19v3M9 22h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        @if (query().trim()) {
+          <button class="submit-btn" (click)="goSearch()" id="search-submit-btn" aria-label="Search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        } @else {
+          <button class="waveform-btn" id="waveform-btn" aria-label="Voice waveform">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M4 12h2M8 8v8M12 5v14M16 8v8M20 12h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (suggestions().length > 0 && isFocused()) {
+      <ul class="suggestions-list" role="listbox">
+        @for (s of suggestions(); track s; let i = $index) {
+          <li
+            class="suggestion-item"
+            [class.selected]="selectedIdx() === i"
+            (mousedown)="pickSuggestion(s)"
+            role="option"
+            [id]="'suggestion-' + i"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M21 21l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>{{ s }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <div class="feature-cards">
+    <button class="feature-card card-search" (click)="query.set('Search anything'); goSearch()" id="card-search-btn">
+      <div class="card-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="card-content">
+        <div class="card-title">Search anything</div>
+        <div class="card-desc">Get fast and accurate answers from the most trusted sources.</div>
+      </div>
+    </button>
+
+    <button class="feature-card card-computer" id="card-computer-btn">
+      <div class="card-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8M12 17v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="card-content">
+        <div class="card-title">
+          Get work done with Computer
+          <span class="new-badge">NEW</span>
+        </div>
+        <div class="card-desc">Hand off your projects to get polished, reliable deliverables around the clock.</div>
+      </div>
+    </button>
+  </div>
+</main>

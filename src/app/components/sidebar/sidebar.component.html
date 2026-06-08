@@ -1,0 +1,81 @@
+<nav class="sidebar" [class.collapsed]="collapsed()">
+  
+  <div class="sidebar-top">
+    <a routerLink="/" class="logo-link" aria-label="Perplexity home">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L14.09 8.26L20.71 6.36L16.71 11.42L21.42 15.48L14.54 14.74L13.18 21.5L9.46 15.7L2.58 18.16L6.22 12.18L1 8.36L7.65 8.78L12 2Z" fill="#20b8cd"/>
+      </svg>
+    </a>
+    @if (!collapsed()) {
+      <button class="collapse-btn" (click)="toggle()" title="Collapse sidebar" id="sidebar-collapse-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="18" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M14 7h4M14 12h4M14 17h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    } @else {
+      <button class="collapse-btn" (click)="toggle()" title="Expand sidebar" id="sidebar-expand-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="18" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M14 7h4M14 12h4M14 17h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    }
+  </div>
+
+  <div class="nav-items">
+    <button class="nav-item new-btn" (click)="newSearch()" id="new-search-btn">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </span>
+      @if (!collapsed()) {
+        <span class="nav-label">New</span>
+      }
+    </button>
+
+    <a class="nav-item" routerLink="/discover" routerLinkActive="active" id="nav-computer">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 20h8M12 17v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </span>
+      @if (!collapsed()) { <span class="nav-label">Computer</span> }
+    </a>
+
+    <a class="nav-item" routerLink="/spaces" routerLinkActive="active" id="nav-spaces">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </span>
+      @if (!collapsed()) { <span class="nav-label">Spaces</span> }
+    </a>
+
+    <a class="nav-item" routerLink="/artifacts" routerLinkActive="active" id="nav-artifacts">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      @if (!collapsed()) { <span class="nav-label">Artifacts</span> }
+    </a>
+
+    <a class="nav-item" routerLink="/history" routerLinkActive="active" id="nav-customize">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.6"/></svg>
+      </span>
+      @if (!collapsed()) { <span class="nav-label">Customize</span> }
+    </a>
+
+    <a class="nav-item" routerLink="/history" routerLinkActive="active" id="nav-history">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </span>
+      @if (!collapsed()) { <span class="nav-label">History</span> }
+    </a>
+
+    @if (!collapsed()) {
+      <div class="no-sessions">No recent sessions</div>
+    }
+  </div>
+
+  <div class="sidebar-bottom">
+    <button class="sign-in-btn" id="sign-in-btn">
+      <span class="sign-in-avatar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </span>
+      @if (!collapsed()) {
+        <span class="sign-in-label">Sign In</span>
+        <svg class="sign-in-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      }
+    </button>
+  </div>
+</nav>
