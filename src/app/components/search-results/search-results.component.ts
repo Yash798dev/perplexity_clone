@@ -1,22 +1,27 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SearchService } from '../../services/search.service';
+import { MindmapComponent } from '../mindmap/mindmap.component';
+import { QuizComponent } from '../quiz/quiz.component';
 
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, MindmapComponent, QuizComponent],
   templateUrl: './search-results.component.html',
-  styleUrl: './search-results.component.scss'
+  styleUrl: './search-results.component.scss',
 })
 export class SearchResultsComponent implements OnInit {
   protected svc = inject(SearchService);
   private router = inject(Router);
 
   protected followupQuery = signal('');
-  protected showImages = signal(false);
   protected copiedAnswer = signal(false);
+  protected showMindMap = signal(false);
+  protected showQuiz = signal(false);
+
+  protected currentTopic = computed(() => this.svc.topicKey());
 
   ngOnInit(): void {
     if (!this.svc.query()) this.router.navigate(['/']);
@@ -34,9 +39,21 @@ export class SearchResultsComponent implements OnInit {
       .replace(/\n/g, '<br>');
   }
 
+  protected toggleMindMap(): void {
+    this.showMindMap.update(v => !v);
+    if (this.showMindMap()) this.showQuiz.set(false);
+  }
+
+  protected toggleQuiz(): void {
+    this.showQuiz.update(v => !v);
+    if (this.showQuiz()) this.showMindMap.set(false);
+  }
+
   protected followUp(): void {
     const q = this.followupQuery().trim();
     if (!q) return;
+    this.showMindMap.set(false);
+    this.showQuiz.set(false);
     this.svc.search(q);
     this.followupQuery.set('');
   }
@@ -51,6 +68,8 @@ export class SearchResultsComponent implements OnInit {
   }
 
   protected searchRelated(q: string): void {
+    this.showMindMap.set(false);
+    this.showQuiz.set(false);
     this.svc.search(q);
   }
 }

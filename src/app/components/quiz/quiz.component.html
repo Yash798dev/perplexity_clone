@@ -1,0 +1,96 @@
+@if (!finished()) {
+  @if (currentQuestion(); as q) {
+    <div class="quiz-wrap">
+
+      <div class="quiz-header">
+        <div class="quiz-meta">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#7c6af7" stroke-width="1.8"/>
+            <path d="M12 8v4l3 3" stroke="#7c6af7" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Quiz Mode
+        </div>
+        <div class="quiz-counter">{{ currentIndex() + 1 }} / {{ questions().length }}</div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress()"></div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-text">{{ q.question }}</div>
+        <div class="options-list">
+          @for (opt of q.options; track opt; let i = $index) {
+            <button
+              class="option-btn"
+              [class]="getOptionClass(i)"
+              [disabled]="answered()"
+              (click)="selectOption(i)"
+              [id]="'quiz-option-' + i"
+            >
+              <span class="opt-letter">{{ ['A','B','C','D'][i] }}</span>
+              <span class="opt-text">{{ opt }}</span>
+              @if (answered() && i === q.correctIndex) {
+                <svg class="opt-icon correct-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 13l4 4L19 7" stroke="#5ecb8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              }
+              @if (answered() && i === selectedOption() && i !== q.correctIndex) {
+                <svg class="opt-icon wrong-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M18 6L6 18M6 6l12 12" stroke="#f76a8a" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (showExplanation()) {
+        <div class="explanation-box" [class.correct-exp]="selectedOption() === q.correctIndex"
+             [class.wrong-exp]="selectedOption() !== q.correctIndex">
+          <div class="exp-icon">
+            @if (selectedOption() === q.correctIndex) { ✅ } @else { 💡 }
+          </div>
+          <div class="exp-text">{{ q.explanation }}</div>
+        </div>
+      }
+
+      @if (answered()) {
+        <button class="next-btn" (click)="nextQuestion()" id="quiz-next-btn">
+          @if (currentIndex() + 1 < questions().length) {
+            Next Question
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          } @else {
+            See Results
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z" fill="currentColor"/>
+            </svg>
+          }
+        </button>
+      }
+
+    </div>
+  }
+} @else {
+  <div class="score-screen">
+    <div class="score-emoji">{{ scoreLabel() }}</div>
+    <div class="score-numbers">
+      <span class="score-val">{{ score() }}</span>
+      <span class="score-sep">/</span>
+      <span class="score-total">{{ questions().length }}</span>
+    </div>
+    <div class="score-pct">{{ (score() / questions().length * 100).toFixed(0) }}% correct</div>
+    <div class="score-bar">
+      <div class="score-bar-fill" [style.width.%]="score() / questions().length * 100"></div>
+    </div>
+    <button class="restart-btn" (click)="restart()" id="quiz-restart-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-6.51L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Try Again
+    </button>
+  </div>
+}

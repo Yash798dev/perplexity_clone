@@ -100,6 +100,7 @@ export class SearchService {
   readonly answer = signal<AiAnswer | null>(null);
   readonly isLoading = signal(false);
   readonly history = signal<{id:string;query:string;ts:Date}[]>([]);
+  readonly topicKey = signal('default');
 
   readonly hasResults = computed(() => this.results().length > 0);
 
@@ -111,6 +112,7 @@ export class SearchService {
     this.answer.set(null);
 
     const key = this.getKey(q);
+    this.topicKey.set(key);
     setTimeout(() => {
       this.results.set(MOCK_RESULTS[key] ?? MOCK_RESULTS['default']);
       this.isLoading.set(false);
