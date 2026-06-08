@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { SearchService } from '../../services/search.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,6 +13,7 @@ import { SearchService } from '../../services/search.service';
 export class SidebarComponent {
   private router = inject(Router);
   protected search = inject(SearchService);
+  protected theme = inject(ThemeService);
   protected collapsed = signal(false);
 
   protected toggle(): void { this.collapsed.update(v => !v); }
