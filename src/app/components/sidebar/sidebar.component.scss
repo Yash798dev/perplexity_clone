@@ -53,6 +53,8 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .nav-item {
@@ -76,6 +78,12 @@
 }
 
 .new-btn {
+  margin-bottom: 2px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.new-chat-btn {
   margin-bottom: 4px;
   color: var(--text);
   font-weight: 500;
@@ -92,11 +100,144 @@
 
 .nav-label { font-size: 14px; overflow: hidden; }
 
+.chats-section-header {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 16px 8px 6px;
+  white-space: nowrap;
+}
+
+.chats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chat-session-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: var(--text-2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  position: relative;
+  white-space: nowrap;
+  
+  &:hover {
+    background: var(--hover-bg);
+    color: var(--text);
+    
+    .delete-chat-btn {
+      opacity: 1;
+    }
+  }
+  
+  &.active-chat {
+    background: var(--hover-bg);
+    color: var(--text);
+  }
+}
+
+.chat-icon {
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+
+.chat-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 18px;
+}
+
+.delete-chat-btn {
+  position: absolute;
+  right: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: opacity 0.15s, color 0.15s, background-color 0.15s;
+  
+  &:hover {
+    color: #ea4335;
+    background: rgba(234, 67, 53, 0.1);
+  }
+}
+
 .no-sessions {
   font-size: 11px;
   color: var(--text-3);
   padding: 8px 8px 4px;
   white-space: nowrap;
+}
+
+.delete-confirm-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  animation: fadeConfirm 0.15s ease;
+}
+
+.delete-confirm-text {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: #ea4335;
+  white-space: nowrap;
+}
+
+.del-yes-btn {
+  background: #ea4335;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+  flex-shrink: 0;
+
+  &:hover { background: #c5221f; }
+}
+
+.del-no-btn {
+  background: var(--hover-bg);
+  color: var(--text-2);
+  border: none;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+  flex-shrink: 0;
+
+  &:hover { background: var(--pill-hover); }
+}
+
+@keyframes fadeConfirm {
+  from { opacity: 0; transform: translateX(-4px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 .sidebar-bottom {
@@ -167,7 +308,7 @@
   user-select: none;
 }
 
-/* ── Sign In ── */
+/* ── Sign In & Logged In Profile ── */
 .sign-in-btn {
   display: flex;
   align-items: center;
@@ -180,6 +321,7 @@
   color: var(--text-2);
   font-size: 14px;
   transition: background 0.12s, color 0.12s;
+  cursor: pointer;
 
   &:hover { background: var(--hover-bg); color: var(--text); }
 }
@@ -194,5 +336,38 @@
   flex-shrink: 0;
 }
 
+.user-initials {
+  background: var(--teal);
+  color: white;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-email {
+  font-size: 11px;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sign-in-label { flex: 1; font-size: 14px; text-align: left; }
 .sign-in-arrow { color: var(--text-3); flex-shrink: 0; }
+

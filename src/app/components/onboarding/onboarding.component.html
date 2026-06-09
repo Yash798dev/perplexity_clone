@@ -1,0 +1,55 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="logo-area">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L14.09 8.26L20.71 6.36L16.71 11.42L21.42 15.48L14.54 14.74L13.18 21.5L9.46 15.7L2.58 18.16L6.22 12.18L1 8.36L7.65 8.78L12 2Z" fill="#20b8cd"/>
+      </svg>
+      <h2>Complete Your Profile</h2>
+      <p class="subtitle">Just a few more details to set up your account.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form (submit)="onSubmit()" class="auth-form">
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input 
+          type="text" 
+          id="fullName" 
+          name="fullName" 
+          placeholder="John Doe"
+          [ngModel]="fullName()" 
+          (ngModelChange)="fullName.set($event)"
+          required 
+          autocomplete="name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input 
+          type="tel" 
+          id="phoneNumber" 
+          name="phoneNumber" 
+          placeholder="+1 (555) 000-0000"
+          [ngModel]="phoneNumber()" 
+          (ngModelChange)="phoneNumber.set($event)"
+          required 
+          autocomplete="tel"
+        />
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          <span>Saving details...</span>
+        } @else {
+          <span>Finish Setup</span>
+        }
+      </button>
+    </form>
+  </div>
+</div>

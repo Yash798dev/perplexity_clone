@@ -39,7 +39,7 @@ const ARTICLES: Article[] = [
       <!-- Articles -->
       <div class="articles-col">
         <!-- Hero article -->
-        <div class="article hero-article" id="article-1">
+        <div class="article hero-article" id="article-1" (click)="openArticle(articles()[0])" style="cursor: pointer;">
           <div class="hero-text">
             <div class="article-topic">{{ articles()[0].topic }}</div>
             <h3 class="hero-title">{{ articles()[0].title }}</h3>
@@ -71,7 +71,7 @@ const ARTICLES: Article[] = [
         <!-- Grid of 3 articles -->
         <div class="articles-grid">
           @for (art of articles().slice(1,4); track art.id) {
-            <div class="article grid-article" [id]="'article-' + art.id">
+            <div class="article grid-article" [id]="'article-' + art.id" (click)="openArticle(art)" style="cursor: pointer;">
               <img class="grid-image" [src]="art.image" [alt]="art.title" loading="lazy" />
               <div class="grid-content">
                 <h3 class="grid-title">{{ art.title }}</h3>
@@ -95,7 +95,7 @@ const ARTICLES: Article[] = [
 
         <!-- More articles -->
         @for (art of articles().slice(4); track art.id) {
-          <div class="article list-article" [id]="'article-' + art.id">
+          <div class="article list-article" [id]="'article-' + art.id" (click)="openArticle(art)" style="cursor: pointer;">
             <div class="list-content">
               <h3 class="list-title">{{ art.title }}</h3>
               <div class="list-footer">
@@ -164,12 +164,34 @@ const ARTICLES: Article[] = [
         </div>
       </aside>
     </div>
-  </div>`,
+  </div>
+
+  <!-- Dynamic Detail Modal -->
+  @if (activeArticle()) {
+    <div class="modal-overlay" (click)="closeArticle()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <button class="modal-close-btn" (click)="closeArticle()">✕</button>
+        <img class="modal-image" [src]="activeArticle()?.image" [alt]="activeArticle()?.title" />
+        <div class="modal-body">
+          <span class="modal-topic">{{ activeArticle()?.topic }}</span>
+          <h2 class="modal-title">{{ activeArticle()?.title }}</h2>
+          <div class="modal-meta">
+            <span>Published {{ activeArticle()?.time }}</span>
+            <span>·</span>
+            <span>{{ activeArticle()?.sources }} sources</span>
+          </div>
+          <p class="modal-content">{{ activeArticle()?.summary }} This deep-dive report is dynamically generated from real-time global news syndications. Comet analyzes, verifies, and extracts key entities from multiple reliable publications to form a singular, comprehensive report for our users.</p>
+        </div>
+      </div>
+    </div>
+  }
+  `,
   styleUrl: './discover.component.scss'
 })
 export class DiscoverComponent {
   protected articles = signal<Article[]>(ARTICLES);
   protected selectedInterests = signal<string[]>(['Tech & Science', 'Business']);
+  protected activeArticle = signal<Article | null>(null);
 
   protected weatherDays = [
     { d:'Mon', temp:'36', icon:'☁️' }, { d:'Tue', temp:'33', icon:'🌧' },
@@ -191,5 +213,13 @@ export class DiscoverComponent {
 
   protected saveInterests(): void {
     console.log('Saved interests:', this.selectedInterests());
+  }
+
+  protected openArticle(art: Article): void {
+    this.activeArticle.set(art);
+  }
+
+  protected closeArticle(): void {
+    this.activeArticle.set(null);
   }
 }

@@ -1,0 +1,66 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="logo-area">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L14.09 8.26L20.71 6.36L16.71 11.42L21.42 15.48L14.54 14.74L13.18 21.5L9.46 15.7L2.58 18.16L6.22 12.18L1 8.36L7.65 8.78L12 2Z" fill="#20b8cd"/>
+      </svg>
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Ask anything, search everything.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form (submit)="onSubmit()" class="auth-form">
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          placeholder="name@domain.com"
+          [ngModel]="email()" 
+          (ngModelChange)="email.set($event)"
+          required 
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="••••••••"
+          [ngModel]="password()" 
+          (ngModelChange)="password.set($event)"
+          required 
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          <span>Signing in...</span>
+        } @else {
+          <span>Sign In</span>
+        }
+      </button>
+    </form>
+
+    <div class="divider">
+      <span>or</span>
+    </div>
+
+    <div id="googleBtn" class="google-btn-container" style="display: flex; justify-content: center; margin-top: 12px;"></div>
+
+    <div class="auth-footer">
+      <span>Don't have an account?</span>
+      <a routerLink="/signup" class="link-btn">Sign up</a>
+    </div>
+  </div>
+</div>

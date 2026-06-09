@@ -1,0 +1,58 @@
+[
+  {
+    "id": "1b6f2011-0293-46cd-8360-a09be231c53f",
+    "session_id": "e6abe84d-e488-4004-9b8c-d588c5dfb1ba",
+    "role": "user",
+    "content": "hi",
+    "created_at": "2026-06-09T08:09:40.143Z"
+  },
+  {
+    "id": "8a76445f-2151-4709-9347-83c3753f4e66",
+    "session_id": "e6abe84d-e488-4004-9b8c-d588c5dfb1ba",
+    "role": "bot",
+    "content": "Hello! I'm Comet, your AI assistant. I'm here to answer your questions across a wide range of topics including science, technology, history, geography, and more. What would you like to know today?",
+    "created_at": "2026-06-09T08:09:40.161Z"
+  },
+  {
+    "id": "46d10c42-816c-4f6e-9869-cd9524098c83",
+    "session_id": "e6abe84d-e488-4004-9b8c-d588c5dfb1ba",
+    "role": "user",
+    "content": "hello",
+    "created_at": "2026-06-09T08:10:19.050Z"
+  },
+  {
+    "id": "736905ad-3e3d-4796-a75d-96919d23ee4f",
+    "session_id": "e6abe84d-e488-4004-9b8c-d588c5dfb1ba",
+    "role": "bot",
+    "content": "Hello! I'm Comet, your AI assistant. I'm here to answer your questions across a wide range of topics including science, technology, history, geography, and more. What would you like to know today?",
+    "created_at": "2026-06-09T08:10:19.079Z"
+  },
+  {
+    "id": "6806b936-d4ca-4c59-b8e8-6fefa8ee81ef",
+    "session_id": "e6abe84d-e488-4004-9b8c-d588c5dfb1ba",
+    "role": "user",
+    "content": "explain ml",
+    "created_at": "2026-06-09T08:10:25.276Z"
+  },
+  {
+    "id": "ff497392-0d11-469f-86cc-09cfec6555fd",
+    "session_id": "e6abe84d-e488-4004-9b8c-d588c5dfb1ba",
+    "role": "bot",
+    "content": "Machine learning (ML) is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed. It focuses on building algorithms that can access data and use it to learn for themselves. Common types include supervised learning, unsupervised learning, and reinforcement learning.",
+    "created_at": "2026-06-09T08:10:25.281Z"
+  },
+  {
+    "id": "6f2e5e6f-090c-4604-895e-ea7daa48caa6",
+    "session_id": "e6abe84d-e488-4004-9b8c-d588c5dfb1ba",
+    "role": "user",
+    "content": "agentic ai",
+    "created_at": "2026-06-09T08:10:36.187Z"
+  },
+  {
+    "id": "f7ddbf4a-bda4-49ff-b73a-a409fcf8ff8f",
+    "session_id": "e6abe84d-e488-4004-9b8c-d588c5dfb1ba",
+    "role": "bot",
+    "content": "Artificial Intelligence (AI) is the simulation of human intelligence in machines programmed to think and learn like humans. AI encompasses a wide range of capabilities including natural language processing, computer vision, problem solving, and decision making. Key branches include machine learning, deep learning, and neural networks.",
+    "created_at": "2026-06-09T08:10:36.199Z"
+  }
+]

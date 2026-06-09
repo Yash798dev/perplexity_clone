@@ -23,7 +23,16 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </span>
       @if (!collapsed()) {
-        <span class="nav-label">New</span>
+        <span class="nav-label">New Search</span>
+      }
+    </button>
+
+    <button class="nav-item new-chat-btn" (click)="newChat()" id="new-chat-btn">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      @if (!collapsed()) {
+        <span class="nav-label">New Chat</span>
       }
     </button>
 
@@ -48,13 +57,6 @@
       @if (!collapsed()) { <span class="nav-label">Artifacts</span> }
     </a>
 
-    <a class="nav-item" routerLink="/history" routerLinkActive="active" id="nav-customize">
-      <span class="nav-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.6"/></svg>
-      </span>
-      @if (!collapsed()) { <span class="nav-label">Customize</span> }
-    </a>
-
     <a class="nav-item" routerLink="/history" routerLinkActive="active" id="nav-history">
       <span class="nav-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -62,8 +64,33 @@
       @if (!collapsed()) { <span class="nav-label">History</span> }
     </a>
 
+    <!-- Chats Section -->
     @if (!collapsed()) {
-      <div class="no-sessions">No recent sessions</div>
+      <div class="chats-section-header">Active Chats</div>
+      <div class="chats-list">
+        @if (chatApi.sessions().length === 0) {
+          <div class="no-sessions">No recent chats</div>
+        } @else {
+          @for (sess of chatApi.sessions(); track sess.id) {
+            <div class="chat-session-item" (click)="selectSession(sess.id)" [class.active-chat]="router.url.includes(sess.id)">
+              @if (pendingDeleteId() === sess.id) {
+                <!-- Inline confirm delete -->
+                <div class="delete-confirm-row">
+                  <span class="delete-confirm-text">Delete?</span>
+                  <button class="del-yes-btn" (click)="confirmDelete($event, sess.id)" title="Yes, delete">✓</button>
+                  <button class="del-no-btn" (click)="cancelDelete($event)" title="Cancel">✕</button>
+                </div>
+              } @else {
+                <svg class="chat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="chat-title">{{ sess.title }}</span>
+                <button class="delete-chat-btn" (click)="promptDelete($event, sess.id)" title="Delete session">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
     }
   </div>
 
@@ -100,14 +127,30 @@
       </div>
     </button>
 
-    <button class="sign-in-btn" id="sign-in-btn">
-      <span class="sign-in-avatar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      </span>
-      @if (!collapsed()) {
-        <span class="sign-in-label">Sign In</span>
-        <svg class="sign-in-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      }
-    </button>
+    @if (auth.isLoggedIn()) {
+      <!-- User Profile Navigation Link -->
+      <a routerLink="/profile" class="sign-in-btn logged-in-profile" id="profile-btn">
+        <span class="sign-in-avatar user-initials">
+          {{ getInitials() }}
+        </span>
+        @if (!collapsed()) {
+          <div class="user-meta">
+            <span class="sign-in-label user-name">{{ auth.currentUser()?.fullName || 'User' }}</span>
+            <span class="user-email">{{ auth.currentUser()?.email }}</span>
+          </div>
+          <svg class="sign-in-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        }
+      </a>
+    } @else {
+      <a routerLink="/login" class="sign-in-btn" id="sign-in-btn">
+        <span class="sign-in-avatar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </span>
+        @if (!collapsed()) {
+          <span class="sign-in-label">Sign In</span>
+          <svg class="sign-in-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        }
+      </a>
+    }
   </div>
 </nav>

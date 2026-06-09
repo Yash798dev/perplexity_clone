@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-finance',
@@ -39,7 +39,7 @@ import { Component } from '@angular/core';
         <!-- News -->
         <div class="section-title" style="margin-top:24px">Market News</div>
         @for (n of news; track n.title) {
-          <div class="news-row">
+          <div class="news-row" (click)="openNews(n)" style="cursor: pointer;">
             <div class="news-content">
               <span class="news-source">{{ n.source }}</span>
               <div class="news-title">{{ n.title }}</div>
@@ -84,10 +84,28 @@ import { Component } from '@angular/core';
         </div>
       </aside>
     </div>
-  </div>`,
+  </div>
+
+  <!-- Dynamic Detail Modal -->
+  @if (activeNews()) {
+    <div class="modal-overlay" (click)="closeNews()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <button class="modal-close-btn" (click)="closeNews()">✕</button>
+        <div class="modal-body">
+          <span class="modal-topic">{{ activeNews()?.source }} · {{ activeNews()?.time }}</span>
+          <h2 class="modal-title">{{ activeNews()?.title }}</h2>
+          <hr class="modal-divider">
+          <p class="modal-content">Federal policy updates and corporate developments have driven recent market spikes. Comet aggregates direct updates from major financial journals, ensuring you stay up-to-date with comprehensive global intelligence indexes and economic calendars.</p>
+        </div>
+      </div>
+    </div>
+  }
+  `,
   styleUrl: './finance.component.scss'
 })
 export class FinanceComponent {
+  protected activeNews = signal<any | null>(null);
+
   markets = [
     { name:'S&P 500', value:'5,842.47', change:'12.50', pct:'0.21%', up:true, spark:'10,28 20,18 30,22 40,14 50,20 60,10 70,16 80,8 90,12 100,6' },
     { name:'Dow Jones', value:'42,162.12', change:'180.20', pct:'0.43%', up:true, spark:'10,20 20,14 30,18 40,10 50,16 60,8 70,14 80,6 90,10 100,4' },
@@ -115,4 +133,12 @@ export class FinanceComponent {
     { name:'Ethereum (ETH)', icon:'Ξ', price:'$3,842', pct:'2.1%' },
     { name:'Solana (SOL)', icon:'◎', price:'$172.40', pct:'4.2%' },
   ];
+
+  protected openNews(n: any): void {
+    this.activeNews.set(n);
+  }
+
+  protected closeNews(): void {
+    this.activeNews.set(null);
+  }
 }

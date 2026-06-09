@@ -1,0 +1,18 @@
+[
+  {
+    "id": "2738918a-c484-48ae-9540-f9f047cd6a40",
+    "email": "yashwanthdevangam@gmail.com",
+    "password_hash": "$2a$12$u1MguEUlcoGhcf0JjYmFJuEH2KMWeExZ2/dXZu.kGPKaw8LyW4iCq",
+    "google_id": null,
+    "is_onboarded": 1,
+    "created_at": "2026-06-09T07:27:57.585Z"
+  },
+  {
+    "id": "9959b5ff-1dcd-474e-b5f1-c9b6b16d1ce9",
+    "email": "yashwanth9182444@gmail.com",
+    "password_hash": "107441151470066469672",
+    "google_id": null,
+    "is_onboarded": 1,
+    "created_at": "2026-06-09T08:41:24.175Z"
+  }
+]

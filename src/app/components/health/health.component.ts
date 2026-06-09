@@ -1,32 +1,61 @@
-import { Component } from '@angular/core';
-@Component({ selector:'app-health', standalone:true, template:`
-<div class="gen-page">
-  <div class="page-header"><h2>Health</h2>
-    <div class="tab-row"><button class="ptab active">Top</button><button class="ptab">Wellness</button><button class="ptab">Research</button><button class="ptab">Nutrition</button></div>
-  </div>
-  <div class="gen-layout">
-    <div class="gen-main">
-      @for (a of articles; track a.title) {
-        <div class="gen-article">
-          <img class="gen-img" [src]="a.img" [alt]="a.title" loading="lazy"/>
-          <div class="gen-content">
-            <div class="gen-topic">{{ a.topic }}</div>
-            <div class="gen-title">{{ a.title }}</div>
-            <div class="gen-snippet">{{ a.snippet }}</div>
-            <div class="gen-meta">{{ a.sources }} sources · {{ a.time }}</div>
-          </div>
-        </div>
-      }
+import { Component, signal } from '@angular/core';
+
+@Component({
+  selector: 'app-health',
+  standalone: true,
+  template: `
+  <div class="gen-page">
+    <div class="page-header"><h2>Health</h2>
+      <div class="tab-row"><button class="ptab active">Top</button><button class="ptab">Wellness</button><button class="ptab">Research</button><button class="ptab">Nutrition</button></div>
     </div>
-    <aside class="gen-sidebar">
-      <div class="widget">
-        <div class="widget-title">Health Topics</div>
-        @for (t of topics; track t) { <div class="topic-chip">{{ t }}</div> }
+    <div class="gen-layout">
+      <div class="gen-main">
+        @for (a of articles; track a.title) {
+          <div class="gen-article" (click)="openHealthArticle(a)" style="cursor: pointer;">
+            <img class="gen-img" [src]="a.img" [alt]="a.title" loading="lazy"/>
+            <div class="gen-content">
+              <div class="gen-topic">{{ a.topic }}</div>
+              <div class="gen-title">{{ a.title }}</div>
+              <div class="gen-snippet">{{ a.snippet }}</div>
+              <div class="gen-meta">{{ a.sources }} sources · {{ a.time }}</div>
+            </div>
+          </div>
+        }
       </div>
-    </aside>
+      <aside class="gen-sidebar">
+        <div class="widget">
+          <div class="widget-title">Health Topics</div>
+          @for (t of topics; track t) { <div class="topic-chip">{{ t }}</div> }
+        </div>
+      </aside>
+    </div>
   </div>
-</div>`, styleUrl:'./health.component.scss' })
+
+  <!-- Dynamic Detail Modal -->
+  @if (activeHealthArticle()) {
+    <div class="modal-overlay" (click)="closeHealthArticle()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <button class="modal-close-btn" (click)="closeHealthArticle()">✕</button>
+        <img class="modal-image" [src]="activeHealthArticle()?.img" [alt]="activeHealthArticle()?.title" />
+        <div class="modal-body">
+          <span class="modal-topic">{{ activeHealthArticle()?.topic }}</span>
+          <h2 class="modal-title">{{ activeHealthArticle()?.title }}</h2>
+          <div class="modal-meta">
+            <span>{{ activeHealthArticle()?.sources }} sources</span>
+            <span>·</span>
+            <span>{{ activeHealthArticle()?.time }}</span>
+          </div>
+          <p class="modal-content">{{ activeHealthArticle()?.snippet }} This is an aggregated health science report compiled by Comet. Our system extracts references from medical literature and news networks to give users the latest breakthroughs in clinical cardiology, neuroscience, pharmacology, and metabolic medicine.</p>
+        </div>
+      </div>
+    </div>
+  }
+  `,
+  styleUrl: './health.component.scss'
+})
 export class HealthComponent {
+  protected activeHealthArticle = signal<any | null>(null);
+
   articles = [
     { title:'GLP-1 drugs show promise for reducing heart disease risk beyond weight loss', snippet:'New research shows semaglutide and tirzepatide may have direct cardioprotective effects independent of weight reduction.', topic:'Cardiology', sources:24, time:'1 hour ago', img:'https://picsum.photos/seed/h1/300/180' },
     { title:'Daily walking goals: New study questions 10,000-step rule', snippet:'A landmark analysis of 17 studies suggests that 7,000-8,000 steps per day may be the optimal target for longevity benefits.', topic:'Fitness', sources:16, time:'3 hours ago', img:'https://picsum.photos/seed/h2/300/180' },
@@ -34,4 +63,12 @@ export class HealthComponent {
     { title:'Ozempic users report unexpected mental health benefits', snippet:'A growing body of anecdotal evidence and early research suggests GLP-1 medications may reduce addictive behaviors and improve mood in some patients.', topic:'Mental Health', sources:19, time:'7 hours ago', img:'https://picsum.photos/seed/h4/300/180' },
   ];
   topics = ['Cardiology','Mental Health','Nutrition','Fitness','Cancer Research','Sleep','Vaccines','Pediatrics'];
+
+  protected openHealthArticle(a: any): void {
+    this.activeHealthArticle.set(a);
+  }
+
+  protected closeHealthArticle(): void {
+    this.activeHealthArticle.set(null);
+  }
 }
