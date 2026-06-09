@@ -15,16 +15,23 @@ const allowedOrigins = [
   'https://perplexity-clone-xvkc.onrender.com'
 ];
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('http://localhost:')) {
       return callback(null, true);
     }
-    return callback(null, false);
+    return callback(new Error('Not allowed by CORS'));
   },
-  credentials: true
-}));
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+// Handle OPTIONS preflight for ALL routes first
+app.options('*', cors(corsOptions));
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
