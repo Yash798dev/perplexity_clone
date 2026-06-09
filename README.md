@@ -867,12 +867,3 @@ backend/database/data/messages.json       ← your messages
 
 ---
 
-## 📄 License
-
-This project is for educational purposes — a learning exercise to clone the Perplexity AI interface.
-
----
-
-## 👤 Author
-
-Built with ❤️ using Angular 21 + Node.js.
