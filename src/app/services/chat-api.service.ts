@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface ChatSession {
   id: string;
@@ -29,7 +30,7 @@ interface SendMessageResponse {
 })
 export class ChatApiService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/chats';
+  private apiUrl = `${API_BASE_URL}/api/chats`;
 
   readonly sessions = signal<ChatSession[]>([]);
 

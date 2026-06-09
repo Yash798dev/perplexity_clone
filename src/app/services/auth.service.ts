@@ -2,6 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError, of } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface User {
   id: string;
@@ -24,7 +25,7 @@ interface AuthResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private apiUrl = `${API_BASE_URL}/api/auth`;
 
   // Signals
   readonly currentUser = signal<User | null>(null);
@@ -73,7 +74,7 @@ export class AuthService {
   }
 
   completeOnboarding(fullName: string, phoneNumber: string): Observable<{ user: User }> {
-    return this.http.post<{ user: User }>('http://localhost:3000/api/user/onboarding', { fullName, phoneNumber }).pipe(
+    return this.http.post<{ user: User }>(`${API_BASE_URL}/api/user/onboarding`, { fullName, phoneNumber }).pipe(
       tap(res => {
         this.currentUser.set(res.user);
       })
@@ -81,7 +82,7 @@ export class AuthService {
   }
 
   updateProfile(profileData: { fullName: string; phoneNumber: string; bio?: string; avatarUrl?: string }): Observable<{ user: User }> {
-    return this.http.put<{ user: User }>('http://localhost:3000/api/user/profile', profileData).pipe(
+    return this.http.put<{ user: User }>(`${API_BASE_URL}/api/user/profile`, profileData).pipe(
       tap(res => {
         this.currentUser.set(res.user);
       })

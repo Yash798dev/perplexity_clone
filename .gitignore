@@ -43,4 +43,6 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-./backend
+# Backend environment and dependencies
+backend/.env
+backend/node_modules/
