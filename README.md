@@ -4,7 +4,7 @@ A full-stack, pixel-perfect clone of **Perplexity AI**, built with **Angular 21*
 
 > **Live Demo**
 > - 🌐 Frontend: [https://perplexity-clone-xvkc.onrender.com](https://perplexity-clone-xvkc.onrender.com)
-> - ⚙️ Backend API: [https://perplexity-clone-backend-xvkc.onrender.com](https://perplexity-clone-backend-xvkc.onrender.com)
+> - ⚙️ Backend API: [https://perplexity-clone-backend.onrender.com](https://perplexity-clone-backend.onrender.com)
 
 ---
 
@@ -744,7 +744,7 @@ The backend uses a **keyword-based answer engine** (`backend/utils/qa-engine.js`
    - `JWT_SECRET` → your secret key
    - `GOOGLE_CLIENT_ID` → your Google OAuth client ID
    - `PORT` → (Render sets this automatically)
-5. Deploy and copy the service URL (e.g. `https://perplexity-clone-backend-xvkc.onrender.com`)
+5. Deploy and copy the service URL (e.g. `https://perplexity-clone-backend.onrender.com`)
 
 ### Deploy Frontend to Render
 
