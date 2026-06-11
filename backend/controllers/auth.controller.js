@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const { OAuth2Client } = require('google-auth-library');
 const db = require('../database/db');
 const { signToken } = require('../utils/jwt.utils');
+const { validateEmail, validatePassword } = require('../utils/validation.utils');
 require('dotenv').config();
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -23,14 +24,13 @@ async function signup(req, res, next) {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
-    }
+    const emailError = validateEmail(email);
+    if (emailError) return res.status(400).json({ error: emailError });
 
-    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
+    const passwordError = validatePassword(password);
+    if (passwordError) return res.status(400).json({ error: passwordError });
+
+    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase().trim());
     if (existing) {
       return res.status(409).json({ error: 'An account with this email already exists.' });
     }
@@ -41,7 +41,7 @@ async function signup(req, res, next) {
     db.prepare(`
       INSERT INTO users (id, email, password_hash, is_onboarded)
       VALUES (?, ?, ?, 0)
-    `).run(userId, email.toLowerCase(), passwordHash);
+    `).run(userId, email.toLowerCase().trim(), passwordHash);
 
     db.prepare(`
       INSERT INTO profiles (user_id, full_name, phone_number, avatar_url, bio)
@@ -66,7 +66,10 @@ async function login(req, res, next) {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase());
+    const emailError = validateEmail(email);
+    if (emailError) return res.status(400).json({ error: emailError });
+
+    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase().trim());
     if (!user || !user.password_hash) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }

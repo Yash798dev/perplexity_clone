@@ -46,3 +46,11 @@ Thumbs.db
 # Backend environment and dependencies
 backend/.env
 backend/node_modules/
+
+# SQLite database files
+backend/database/*.db
+backend/database/*.db-shm
+backend/database/*.db-wal
+
+# Legacy JSON storage (replaced by SQLite)
+backend/database/data/

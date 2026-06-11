@@ -15,67 +15,48 @@ A full-stack, pixel-perfect clone of **Perplexity AI**, built with **Angular 21*
 3. [Folder Structure](#-folder-structure)
 4. [Prerequisites](#-prerequisites)
 5. [Local Setup — Step by Step](#-local-setup--step-by-step)
-   - [1. Clone the Repository](#1-clone-the-repository)
-   - [2. Backend Setup](#2-backend-setup)
-   - [3. Frontend Setup](#3-frontend-setup)
-   - [4. Run the App](#4-run-the-app)
 6. [Environment Variables](#-environment-variables)
 7. [Application Routes (Pages)](#-application-routes-pages)
 8. [Backend API Reference](#-backend-api-reference)
-   - [Auth Endpoints](#auth-endpoints)
-   - [User Endpoints](#user-endpoints)
-   - [Chat Endpoints](#chat-endpoints)
 9. [Database Architecture](#-database-architecture)
 10. [Authentication Flow](#-authentication-flow)
 11. [How the Chat / Q&A Engine Works](#-how-the-chat--qa-engine-works)
-12. [Deployment Guide](#-deployment-guide)
-13. [Testing the Output](#-testing-the-output)
+12. [Deployment & Google OAuth Configuration](#-deployment--google-oauth-configuration)
+13. [Running Tests](#-running-tests)
 14. [Troubleshooting](#-troubleshooting)
-15. [Screenshots](#-screenshots)
 
 ---
 
 ## 🚀 Project Overview
 
-Comet is a functional clone of Perplexity.ai with:
-
-- **User Authentication** — Signup, Login, Google Sign-In, JWT-secured sessions
-- **Onboarding Flow** — New users are walked through a profile setup before reaching the main app
-- **Chat Sessions** — Create, browse, continue, and delete multi-turn AI conversations
-- **AI Q&A Engine** — A built-in keyword-driven answer engine responds to user queries
-- **Discovery Pages** — Dedicated views for Finance, Health, Academic research, and Patents
-- **Profile Management** — Users can update their name, phone number, bio, and avatar URL
-- **Route Guards** — All protected pages require authentication and completed onboarding
-- **JSON File Database** — A lightweight, dependency-free mock database powered by JSON files and a custom SQL-to-JS parser (no SQLite binary required)
+Comet is a production-ready Perplexity.ai clone featuring:
+- **User Authentication** — Secure signup, login, Google Sign-In, and JWT-secured routes.
+- **Onboarding Flow** — Profile setup (fullname, phone number) for new users.
+- **SQLite Database** — A robust database using `better-sqlite3` replacing loose JSON files, utilizing WAL mode and foreign key constraints.
+- **Real Backend Search** — A centralized Search API connecting the frontend directly to a backend QA Engine.
+- **Token Security** — Token storage migrated to `sessionStorage` (clearing on tab close) to guard against persistent XSS.
+- **Data Validation & Sanitization** — String validation (via `validator` package) enforcing valid emails and strong passwords (min 8 chars).
+- **Discovery Pages** — Dedicated search/discover feeds for Academic, Patents, Finance, and Health.
+- **Profile Management** — Update names, phone numbers, bio, and avatars.
 
 ---
 
 ## 🛠 Tech Stack
 
 ### Frontend
-| Technology | Version | Purpose |
-|---|---|---|
-| Angular | 21.x | Core SPA framework |
-| TypeScript | 5.9.x | Type safety |
-| SCSS | — | Component styling |
-| RxJS | 7.8.x | Reactive state & HTTP |
-| Angular Router | 21.x | Lazy-loaded page routing |
+- **Angular 21.x** (SPA Framework)
+- **TypeScript 5.9.x** (Type Safety)
+- **SCSS** (Vanilla Component Styling)
+- **RxJS 7.8.x** (State & Http streams)
 
 ### Backend
-| Technology | Version | Purpose |
-|---|---|---|
-| Node.js | ≥ 18 | Runtime |
-| Express.js | 4.x | HTTP server & routing |
-| bcryptjs | 2.x | Password hashing |
-| jsonwebtoken | 9.x | JWT auth tokens |
-| google-auth-library | 9.x | Google OAuth token verification |
-| uuid | 9.x | Unique ID generation |
-| dotenv | 16.x | Environment variable loading |
-| nodemon | 3.x | Dev auto-reload |
-
-### Database
-- **JSON flat files** (no external DB engine needed)
-- Custom in-memory SQL query parser maps SQLite-style `prepare().get/all/run()` calls to plain JS array operations on JSON files
+- **Node.js ≥ 18** & **Express.js 4.x**
+- **better-sqlite3** (SQLite Database driver)
+- **bcryptjs 2.x** (Password hashing)
+- **jsonwebtoken 9.x** (JWT signing & verification)
+- **google-auth-library 9.x** (Google ID token validation)
+- **validator 13.x** (Email & password string validation)
+- **supertest 6.x** & **jest 29.x** (Test framework)
 
 ---
 
@@ -85,68 +66,41 @@ Comet is a functional clone of Perplexity.ai with:
 comet_clone/
 ├── src/                          # Angular frontend source
 │   ├── app/
-│   │   ├── components/           # All page components
-│   │   │   ├── home/             # Landing / search page
-│   │   │   ├── chat/             # Chat conversation view
-│   │   │   ├── search-results/   # Search results page
-│   │   │   ├── discover/         # Discover feed
-│   │   │   ├── finance/          # Finance news/data
-│   │   │   ├── health/           # Health information
-│   │   │   ├── academic/         # Academic research
-│   │   │   ├── patents/          # Patent search
-│   │   │   ├── spaces/           # Spaces feature
-│   │   │   ├── artifacts/        # Saved artifacts
-│   │   │   ├── history/          # Chat history
-│   │   │   ├── profile/          # User profile settings
-│   │   │   ├── login/            # Login page
-│   │   │   ├── signup/           # Signup page
-│   │   │   ├── onboarding/       # New user onboarding
-│   │   │   ├── sidebar/          # Global navigation sidebar
-│   │   │   ├── mindmap/          # Mind map view
-│   │   │   └── quiz/             # Quiz feature
+│   │   ├── components/           # UI Components
+│   │   │   ├── home/             # Landing / Search page
+│   │   │   ├── chat/             # Chat session thread view
+│   │   │   ├── discover/         # Discover feed cards
+│   │   │   ├── login/            # Secure sign-in form
+│   │   │   ├── signup/           # Password validation signup form
+│   │   │   ├── onboarding/       # Name/phone entry
+│   │   │   └── ...
 │   │   ├── config/
-│   │   │   └── api.config.ts     # API base URL (dev vs prod)
-│   │   ├── guards/
-│   │   │   ├── auth.guard.ts     # Requires login
-│   │   │   └── onboarding.guard.ts # Requires completed onboarding
-│   │   ├── interceptors/         # HTTP interceptors (auth token injection)
-│   │   ├── services/
-│   │   │   ├── auth.service.ts   # Login, signup, Google auth, token storage
-│   │   │   └── chat-api.service.ts # Chat session & message API calls
-│   │   ├── app.routes.ts         # All application routes
-│   │   └── app.config.ts         # Angular app bootstrapping
-│   ├── index.html                # HTML shell
-│   └── styles.scss               # Global styles
+│   │   │   └── api.config.ts     # Centralized backend URL
+│   │   ├── guards/               # authGuard & onboardingGuard
+│   │   ├── interceptors/         # authInterceptor (sessionStorage JWT header)
+│   │   ├── services/             # auth.service.ts, search.service.ts
+│   │   └── app.routes.ts         # Angular page router mapping
+│   ├── environments/             # Client-side configuration
+│   │   ├── environment.ts        # Dev environment variables
+│   │   └── environment.prod.ts   # Production environment variables
+│   ├── main.ts
+│   └── styles.scss               # Global styles & theme values
 │
-├── backend/                      # Express.js backend
-│   ├── controllers/
-│   │   ├── auth.controller.js    # Signup, login, Google sign-in, /me
-│   │   ├── chat.controller.js    # Chat sessions & messages CRUD
-│   │   └── user.controller.js    # Profile read/update, onboarding
+├── backend/                      # Node.js backend source
+│   ├── controllers/              # Request handlers (auth, chat, user, search)
 │   ├── database/
-│   │   ├── db.js                 # JSON-based mock database engine
-│   │   └── data/                 # JSON data files (auto-created)
-│   │       ├── users.json
-│   │       ├── profiles.json
-│   │       ├── chat_sessions.json
-│   │       └── messages.json
-│   ├── middleware/
-│   │   ├── auth.middleware.js    # JWT verification middleware
-│   │   └── error.middleware.js   # Global error handler
-│   ├── routes/
-│   │   ├── auth.routes.js        # /api/auth/*
-│   │   ├── user.routes.js        # /api/user/*
-│   │   └── chat.routes.js        # /api/chats/*
-│   ├── utils/
-│   │   ├── jwt.utils.js          # Token sign & verify helpers
-│   │   └── qa-engine.js          # Keyword-based AI answer engine
-│   ├── server.js                 # Express entry point
-│   ├── package.json
-│   └── .env                      # Backend environment variables
+│   │   ├── db.js                 # SQLite connection & WAL runner initialization
+│   │   └── schema.sql            # SQLite database schema
+│   ├── middleware/               # auth.middleware, error.middleware
+│   ├── routes/                   # auth.routes, user.routes, chat.routes, search.routes
+│   ├── utils/                    # jwt.utils, qa-engine, validation.utils
+│   ├── tests/                    # Jest integration test suites (auth, chat)
+│   ├── server.js                 # Express application entry & JWT safety guard
+│   ├── package.json              # Backend scripts & packages
+│   └── .env                      # Local server configuration (Git ignored)
 │
-├── package.json                  # Frontend dependencies
-├── angular.json                  # Angular CLI config
-├── tsconfig.json                 # TypeScript config
+├── angular.json                  # Angular CLI compiler settings
+├── package.json                  # Frontend script commands
 └── README.md
 ```
 
@@ -154,716 +108,179 @@ comet_clone/
 
 ## ✅ Prerequisites
 
-Make sure you have the following installed before starting:
-
-| Tool | Minimum Version | Check Command |
-|---|---|---|
-| Node.js | 18.x or higher | `node -v` |
-| npm | 9.x or higher | `npm -v` |
-| Angular CLI | 21.x | `ng version` |
-| Git | Any recent | `git --version` |
-
-> **Install Angular CLI globally** (if not already):
-> ```bash
-> npm install -g @angular/cli@21
-> ```
+Ensure the following tools are installed locally:
+- **Node.js** (v18.x or higher) -> verify with `node -v`
+- **npm** (v9.x or higher) -> verify with `npm -v`
+- **Angular CLI** (v21.x or higher) -> install globally via `npm install -g @angular/cli`
 
 ---
 
 ## ⚙️ Local Setup — Step by Step
 
-### 1. Clone the Repository
+### 1. Backend Setup
+1. Open a terminal and navigate to the backend folder:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Copy the template environment variables:
+   ```bash
+   copy .env.example .env
+   ```
+4. Open your newly created `.env` and fill in the values:
+   - Make sure to set a secure random string for `JWT_SECRET`.
+   - Add your Google OAuth client ID to `GOOGLE_CLIENT_ID`.
 
-```bash
-git clone https://github.com/your-username/comet_clone.git
-cd comet_clone
-```
-
----
-
-### 2. Backend Setup
-
-```bash
-# Navigate to the backend folder
-cd backend
-
-# Install all backend dependencies
-npm install
-
-# Create your environment file
-# (copy the template below — see the Environment Variables section)
-```
-
-Create a `.env` file inside the `backend/` folder:
-
-```env
-PORT=3000
-JWT_SECRET=your_super_secret_jwt_key_here
-GOOGLE_CLIENT_ID=your_google_oauth_client_id_here
-```
-
-> The `database/data/` directory and all JSON files are **auto-created** on first server start — no manual DB setup required.
+The SQLite database file `comet.db` will be initialized automatically inside `backend/database/` on first server start.
 
 ---
 
-### 3. Frontend Setup
-
-```bash
-# From the project root
-cd ..         # make sure you are in comet_clone/
-npm install
-```
-
-> The frontend API URL is controlled by `src/app/config/api.config.ts`:
-> - In **development** (`ng serve`): automatically points to `http://localhost:3000`
-> - In **production** (deployed build): automatically points to the Render backend URL
+### 2. Frontend Setup
+1. From the project root (`comet_clone/`), install the frontend dependencies:
+   ```bash
+   npm install
+   ```
+2. The Angular app uses compile-time environment swap settings (`angular.json`) which replaces `environment.ts` with `environment.prod.ts` on builds.
 
 ---
 
-### 4. Run the App
+### 3. Running the Application Locally
+You will need two terminal windows open:
 
-You need **two terminals** running simultaneously.
-
-**Terminal 1 — Start the Backend:**
+**Terminal 1 (Backend API):**
 ```bash
 cd backend
-npm run dev      # uses nodemon for hot-reload
-# OR for production-style run:
+npm run dev
+```
+
+**Terminal 2 (Frontend Client):**
+```bash
 npm start
 ```
-
-Expected output:
-```
-Server is running on port 3000
-```
-
-**Terminal 2 — Start the Frontend:**
-```bash
-# from project root (comet_clone/)
-npm start        # runs: ng serve
-# OR
-ng serve
-```
-
-Expected output:
-```
-✔ Browser application bundle generation complete.
-Initial chunk files | Names         | Raw size
-...
-Application bundle generation complete.
-
-Watch mode enabled. Watching for file changes...
-  ➜  Local:   http://localhost:4200/
-```
-
-**Open your browser at:**
-
-```
-http://localhost:4200
-```
+Your default browser will launch at `http://localhost:4200`.
 
 ---
 
 ## 🔑 Environment Variables
 
-### Backend (`backend/.env`)
-
-| Variable | Required | Description |
+### Backend Configuration (`backend/.env`)
+| Variable | Description | Default / Format |
 |---|---|---|
-| `PORT` | Optional | Port the server listens on. Defaults to `3000` |
-| `JWT_SECRET` | **Required** | Secret key used to sign and verify JWT tokens. Use a long random string |
-| `GOOGLE_CLIENT_ID` | Required for Google Sign-In | OAuth 2.0 Client ID from Google Cloud Console |
-
-**Example `.env`:**
-```env
-PORT=3000
-JWT_SECRET=mySuperSecretKey_changeThis_inProduction_!@#456
-GOOGLE_CLIENT_ID=123456789-abcdefg.apps.googleusercontent.com
-```
-
-> ⚠️ Never commit your `.env` file. It is already listed in `.gitignore`.
+| `PORT` | Listening port for the express server | `3000` |
+| `NODE_ENV` | Run-time mode | `development` |
+| `JWT_SECRET` | Cryptographic secret for signing tokens | Minimum 32-character string |
+| `GOOGLE_CLIENT_ID` | Client identifier from Google Cloud Console | `xxxx-xxxx.apps.googleusercontent.com` |
+| `DB_PATH` | Path where the SQLite `.db` file is stored | `./database/comet.db` |
+| `FRONTEND_URL` | Cross-Origin Allowed Origin URL | `http://localhost:4200` |
 
 ---
 
 ## 🗺 Application Routes (Pages)
 
-| Route | Access | Description |
-|---|---|---|
-| `/login` | Public | Email/password and Google login |
-| `/signup` | Public | New account registration |
-| `/onboarding` | Auth required | First-time profile setup (name, phone) |
-| `/` | Auth + Onboarded | Home — main search interface |
-| `/search?q=...` | Auth + Onboarded | AI search results for a query |
-| `/chat` | Auth + Onboarded | New blank chat session |
-| `/chat/:id` | Auth + Onboarded | Continue a specific chat session |
-| `/discover` | Auth + Onboarded | Discover trending topics |
-| `/finance` | Auth + Onboarded | Finance news and data |
-| `/health` | Auth + Onboarded | Health information hub |
-| `/academic` | Auth + Onboarded | Academic research results |
-| `/patents` | Auth + Onboarded | Patent search interface |
-| `/spaces` | Auth + Onboarded | Collaborative spaces |
-| `/artifacts` | Auth + Onboarded | Saved artifacts |
-| `/history` | Auth + Onboarded | Full chat history |
-| `/profile` | Auth + Onboarded | User profile & settings |
-
-**Route Guards:**
-- `authGuard` — Redirects to `/login` if no valid JWT is present
-- `onboardingGuard` — Redirects to `/onboarding` if `isOnboarded === false`
+- `/login` - Sign-in page with Google OAuth option.
+- `/signup` - Sign-up page enforcing email syntax and 8-character passwords.
+- `/onboarding` - Collects profile name and phone number on first login.
+- `/` - Main landing page with a Perplexity-style search interface.
+- `/search?q=query` - Fetches and displays answers from the API.
+- `/chat` - Directs to a new messaging session.
+- `/chat/:id` - Loads and allows continuing an existing session.
+- `/history` - Lists past chat sessions with deletion controls.
+- `/profile` - Updates personal details, bio, and avatar URLs.
 
 ---
 
 ## 📡 Backend API Reference
 
-**Base URL (local):** `http://localhost:3000`
-
-All protected endpoints require an `Authorization` header:
-```
-Authorization: Bearer <your_jwt_token>
-```
-
----
-
-### Auth Endpoints
-
-#### `POST /api/auth/signup`
-Register a new user with email and password.
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-**Success Response `201`:**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": "uuid-v4-string",
-    "email": "user@example.com",
-    "isOnboarded": false,
-    "fullName": "",
-    "phoneNumber": "",
-    "avatarUrl": "",
-    "bio": ""
-  }
-}
-```
-
-**Error Responses:**
-| Status | Condition |
-|---|---|
-| `400` | Missing email or password, or password < 6 characters |
-| `409` | Email already registered |
-
----
-
-#### `POST /api/auth/login`
-Log in with existing credentials.
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-**Success Response `200`:**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": "uuid-v4-string",
-    "email": "user@example.com",
-    "isOnboarded": true,
-    "fullName": "John Doe",
-    "phoneNumber": "+1234567890",
-    "avatarUrl": "",
-    "bio": "Researcher"
-  }
-}
-```
-
-**Error Responses:**
-| Status | Condition |
-|---|---|
-| `400` | Missing email or password |
-| `401` | Invalid credentials |
-
----
-
-#### `POST /api/auth/google`
-Authenticate via Google OAuth (pass the Google ID token from the frontend).
-
-**Request Body:**
-```json
-{
-  "idToken": "google-id-token-from-client"
-}
-```
-
-**Success Response `200`:**
-```json
-{
-  "token": "jwt-token",
-  "user": { ... },
-  "isNew": true
-}
-```
-
-> `isNew: true` means this is a first-time Google sign-in (frontend uses this to redirect to onboarding).
-
----
-
-#### `GET /api/auth/me` 🔒
-Returns the currently authenticated user's profile.
-
-**Response `200`:**
-```json
-{
-  "user": {
-    "id": "uuid",
-    "email": "user@example.com",
-    "isOnboarded": true,
-    "fullName": "John Doe",
-    "phoneNumber": "",
-    "avatarUrl": "",
-    "bio": ""
-  }
-}
-```
-
----
-
-### User Endpoints
-
-#### `GET /api/user/profile` 🔒
-Get the authenticated user's profile.
-
-#### `PUT /api/user/profile` 🔒
-Update profile details.
-
-**Request Body:**
-```json
-{
-  "fullName": "Jane Doe",
-  "phoneNumber": "+9876543210",
-  "avatarUrl": "https://example.com/avatar.png",
-  "bio": "Software Engineer"
-}
-```
-
-#### `POST /api/user/onboarding` 🔒
-Mark user onboarding as complete.
-
-**Request Body:**
-```json
-{
-  "fullName": "Jane Doe",
-  "phoneNumber": "+9876543210"
-}
-```
-
----
-
-### Chat Endpoints
-
-#### `GET /api/chats` 🔒
-List all chat sessions for the authenticated user.
-
-**Response `200`:**
-```json
-{
-  "sessions": [
-    {
-      "id": "uuid",
-      "title": "What is quantum computing?",
-      "created_at": "2024-06-09T10:00:00.000Z",
-      "updated_at": "2024-06-09T11:30:00.000Z"
-    }
-  ]
-}
-```
-
----
-
-#### `POST /api/chats` 🔒
-Create a new chat session.
-
-**Request Body:**
-```json
-{
-  "title": "My Research Chat"
-}
-```
-
-**Response `201`:**
-```json
-{
-  "session": {
-    "id": "uuid",
-    "user_id": "user-uuid",
-    "title": "My Research Chat",
-    "created_at": "...",
-    "updated_at": "..."
-  }
-}
-```
-
----
-
-#### `DELETE /api/chats/:id` 🔒
-Delete a chat session and all its messages.
-
-**Response `200`:**
-```json
-{ "success": true }
-```
-
----
-
-#### `GET /api/chats/:id/messages` 🔒
-Retrieve all messages in a chat session (ordered oldest → newest).
-
-**Response `200`:**
-```json
-{
-  "messages": [
-    {
-      "id": "uuid",
-      "role": "user",
-      "content": "What is machine learning?",
-      "created_at": "..."
-    },
-    {
-      "id": "uuid",
-      "role": "bot",
-      "content": "Machine learning is a branch of AI...",
-      "created_at": "..."
-    }
-  ]
-}
-```
-
----
-
-#### `POST /api/chats/:id/messages` 🔒
-Send a user message and receive a bot response.
-
-**Request Body:**
-```json
-{
-  "content": "Explain neural networks"
-}
-```
-
-**Response `200`:**
-```json
-{
-  "userMessage": {
-    "id": "uuid",
-    "role": "user",
-    "content": "Explain neural networks",
-    "created_at": "..."
-  },
-  "botMessage": {
-    "id": "uuid",
-    "role": "bot",
-    "content": "Neural networks are computing systems...",
-    "created_at": "..."
-  },
-  "session": {
-    "id": "uuid",
-    "title": "Explain neural networks",
-    "created_at": "...",
-    "updated_at": "..."
-  }
-}
-```
-
-> The session `title` is automatically set from the **first message** the user sends.
-
----
-
-#### `GET /health`
-Health check — no authentication required.
-
-**Response `200`:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2024-06-09T10:00:00.000Z"
-}
-```
+| Endpoint | Method | Authorization | Description |
+|---|---|---|---|
+| `/api/auth/signup` | POST | None | Signs up user with email & password |
+| `/api/auth/login` | POST | None | Logs user in and yields JWT token |
+| `/api/auth/google` | POST | None | Authorizes a Google Sign-In with an ID token |
+| `/api/auth/me` | GET | Bearer Token | Fetches authenticated user info |
+| `/api/user/profile` | PUT | Bearer Token | Updates full name, avatar, bio |
+| `/api/user/onboarding` | POST | Bearer Token | Marks onboarding complete |
+| `/api/chats` | GET | Bearer Token | Lists all active user chat sessions |
+| `/api/chats` | POST | Bearer Token | Creates a new chat session |
+| `/api/chats/:id` | DELETE | Bearer Token | Deletes a chat session & messages |
+| `/api/chats/:id/messages` | GET | Bearer Token | Fetches message history for a session |
+| `/api/chats/:id/messages` | POST | Bearer Token | Posts user message, triggers bot reply |
+| `/api/search` | GET | None | Queries the backend Q&A engine directly |
 
 ---
 
 ## 🗄 Database Architecture
 
-The project uses a **zero-dependency JSON flat-file database** — no PostgreSQL, no SQLite binary, no external service needed.
-
-### Tables (JSON files in `backend/database/data/`)
-
-| File | Description |
-|---|---|
-| `users.json` | Registered users with email, password hash, Google ID, onboarding status |
-| `profiles.json` | Extended profile data (name, phone, avatar, bio) linked to user |
-| `chat_sessions.json` | Chat sessions with title and timestamps |
-| `messages.json` | All messages (user and bot) linked to sessions |
-
-### Schema
-
-**users**
-```json
-{
-  "id": "uuid",
-  "email": "user@example.com",
-  "password_hash": "$2a$12$...",
-  "google_id": null,
-  "is_onboarded": 0,
-  "created_at": "ISO timestamp"
-}
-```
-
-**profiles**
-```json
-{
-  "user_id": "uuid",
-  "full_name": "John Doe",
-  "phone_number": "+1234567890",
-  "avatar_url": "",
-  "bio": "",
-  "updated_at": "ISO timestamp"
-}
-```
-
-**chat_sessions**
-```json
-{
-  "id": "uuid",
-  "user_id": "uuid",
-  "title": "What is AI?",
-  "created_at": "ISO timestamp",
-  "updated_at": "ISO timestamp"
-}
-```
-
-**messages**
-```json
-{
-  "id": "uuid",
-  "session_id": "uuid",
-  "role": "user | bot",
-  "content": "Message text",
-  "created_at": "ISO timestamp"
-}
-```
+The SQLite schema initializes the following relational structure:
+- **`users`** — Primary user accounts. Holds emails, password hashes, and Google IDs.
+- **`profiles`** — Profile details linked to users via foreign keys with cascade deletions.
+- **`chat_sessions`** — Chat sessions linked to a user.
+- **`messages`** — Chat history logs with roles (`user` or `bot`) linked to a session.
 
 ---
 
 ## 🔐 Authentication Flow
 
-```
-User enters email/password
-        │
-        ▼
-POST /api/auth/login
-        │
-        ▼
-bcrypt.compare(password, hash)
-        │
-     ✅ valid
-        │
-        ▼
-signToken(userId) → JWT (stored in localStorage)
-        │
-        ▼
-Frontend attaches JWT via HTTP Interceptor
-to every subsequent request header:
-  Authorization: Bearer <token>
-        │
-        ▼
-auth.middleware.js verifies JWT on every
-protected route — injects req.user
-        │
-        ▼
-Controller handles the request with req.user.id
-```
-
-**Google Sign-In Flow:**
-```
-User clicks "Continue with Google"
-        │
-        ▼
-Google returns idToken to the browser
-        │
-        ▼
-POST /api/auth/google { idToken }
-        │
-        ▼
-Backend verifies token with Google's servers
-        │
-        ▼
-If new user → insert into users + profiles
-If existing user → link google_id if missing
-        │
-        ▼
-Return JWT + user object + isNew flag
-```
+1. User submits credentials (or Google OAuth credential).
+2. The server verifies passwords via `bcryptjs` (or IDs via Google OAuth client).
+3. The server signs a JSON Web Token (JWT) using the `JWT_SECRET`.
+4. The client receives the token and stores it in **`sessionStorage`** to prevent cross-tab persistent XSS risks.
+5. The Angular `authInterceptor` reads the token from `sessionStorage` and prefixes all requests with `Authorization: Bearer <token>`.
 
 ---
 
 ## 🤖 How the Chat / Q&A Engine Works
 
-The backend uses a **keyword-based answer engine** (`backend/utils/qa-engine.js`):
-
-1. The user's message is received at `POST /api/chats/:id/messages`
-2. The `findAnswer(userContent)` function scans the message for known keywords
-3. A matching pre-written answer is returned as the bot response
-4. Both the user message and bot message are saved to `messages.json`
-5. The session title is auto-set from the first user message (truncated to 50 chars)
-
-> This makes the app fully functional without any external AI API key.
+1. Search requests hit the backend `/api/search?q=query` endpoint.
+2. The endpoint calls `findAnswer()` within `backend/utils/qa-engine.js`.
+3. The query is evaluated using keyword frequency matches against a local corpus.
+4. The matching answer text is sent back as JSON.
+5. In chat threads, the first message's answer is streamed to the UI, and the query is used to auto-name the chat session.
 
 ---
 
-## 🚀 Deployment Guide
+## 🚀 Deployment & Google OAuth Configuration
 
-### Deploy Backend to Render
+### Solving Google OAuth `origin_mismatch` on Render
+When running the app on a live domain (e.g. `https://perplexity-clone-xvkc.onrender.com`), you must configure authorization origins in Google Console:
 
-1. Push the `backend/` folder to a GitHub repository
-2. Go to [render.com](https://render.com) → **New Web Service**
-3. Connect your repo and configure:
-   - **Build Command:** `npm install`
-   - **Start Command:** `node server.js`
-   - **Root Directory:** `backend`
-4. Add Environment Variables in Render dashboard:
-   - `JWT_SECRET` → your secret key
-   - `GOOGLE_CLIENT_ID` → your Google OAuth client ID
-   - `PORT` → (Render sets this automatically)
-5. Deploy and copy the service URL (e.g. `https://perplexity-clone-backend.onrender.com`)
+1. Visit [Google Cloud Console Credentials](https://console.cloud.google.com/apis/credentials).
+2. Edit your OAuth 2.0 Web Client.
+3. Under **Authorized JavaScript origins**, add:
+   - `http://localhost:4200` (for local development)
+   - `https://perplexity-clone-xvkc.onrender.com` (your live Render frontend domain)
+4. Under **Authorized redirect URIs**, configure redirect endpoints if necessary.
+5. Save the configuration (changes apply in roughly 5 minutes).
 
-### Deploy Frontend to Render
+### Environment Synchronization
+- Ensure `environment.ts` and `environment.prod.ts` have correct Google Client IDs.
+- The backend on Render must have its environment variables configured in the Render Dashboard (specifically `JWT_SECRET` and `GOOGLE_CLIENT_ID`).
 
-1. Update `src/app/config/api.config.ts` with your actual backend URL:
-   ```typescript
-   : 'https://your-backend-url.onrender.com';
+---
+
+## 🧪 Running Tests
+
+### Backend Unit & Integration Tests
+Backend tests use a temporary isolated database that spins up in your operating system's temp folder.
+1. Run the test suite:
+   ```bash
+   cd backend
+   npm test
    ```
-2. Go to Render → **New Static Site**
-3. Configure:
-   - **Build Command:** `npm install && ng build`
-   - **Publish Directory:** `dist/comet-clone/browser`
-4. Deploy and visit your live frontend URL
+2. Verify all 28 checks pass.
 
----
-
-## 🧪 Testing the Output
-
-### Quick Smoke Test (Manual)
-
-After starting both servers locally:
-
-**Step 1 — Verify backend is running:**
-```
-GET http://localhost:3000/health
-```
-Expected: `{ "status": "healthy", "timestamp": "..." }`
-
-**Step 2 — Register a new user:**
-```
-POST http://localhost:3000/api/auth/signup
-Content-Type: application/json
-
-{
-  "email": "test@example.com",
-  "password": "test1234"
-}
-```
-Expected: `201` with a `token` and `user` object.
-
-**Step 3 — Open the frontend:**
-```
-http://localhost:4200
-```
-You will be redirected to `/login` automatically.
-
-**Step 4 — Sign up via the UI:**
-- Click **Sign Up**, enter email & password
-- You will be redirected to `/onboarding`
-- Enter your name and phone number, click Continue
-- You will land on the **Home** page
-
-**Step 5 — Start a Chat:**
-- Click the **New Chat** button in the sidebar (or navigate to `/chat`)
-- Type any question such as: `What is machine learning?`
-- The bot will respond instantly with a pre-written answer
-- The session title will be auto-set from your first message
-- Navigate to `/history` to see all your sessions
-
-**Step 6 — Explore pages:**
-| Page | URL |
-|---|---|
-| Discover | `http://localhost:4200/discover` |
-| Finance | `http://localhost:4200/finance` |
-| Health | `http://localhost:4200/health` |
-| Academic | `http://localhost:4200/academic` |
-| Patents | `http://localhost:4200/patents` |
-| Profile | `http://localhost:4200/profile` |
-
-**Step 7 — Test API with curl or Postman:**
-```bash
-# Login and capture token
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"test1234"}'
-
-# Use the token to list chat sessions
-curl http://localhost:3000/api/chats \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-```
-
-### Verify JSON Database
-
-After signing up and chatting, inspect the data files directly:
-
-```
-backend/database/data/users.json          ← your user record
-backend/database/data/profiles.json       ← your profile
-backend/database/data/chat_sessions.json  ← your chat sessions
-backend/database/data/messages.json       ← your messages
-```
+### Frontend Unit Tests
+1. Run the Angular test runner:
+   ```bash
+   ng test --watch=false
+   ```
 
 ---
 
 ## 🔧 Troubleshooting
 
-| Problem | Solution |
-|---|---|
-| `ng: command not found` | Run `npm install -g @angular/cli@21` |
-| `Cannot GET /` on port 3000 | That's normal — use `/health` to test the backend |
-| Frontend shows blank page | Make sure the backend is running on port 3000 |
-| Login fails with `401` | Check the password is correct; ensure `JWT_SECRET` is set in `.env` |
-| Google Sign-In fails | Verify `GOOGLE_CLIENT_ID` in `.env` matches your Google Cloud Console client |
-| Data not persisting | Ensure backend has write permission to `backend/database/data/` |
-| CORS error in browser | Backend only allows `localhost:4200` and the Render frontend URL. Check `server.js` `allowedOrigins` |
-| Port 3000 already in use | Change `PORT=3001` in `.env` and update `api.config.ts` for dev mode |
-
----
-
-## 📸 Screenshots
-
-| Page | Description |
-|---|---|
-| Login | Email/password + Google sign-in |
-| Onboarding | Full-name & phone collection |
-| Home | Perplexity-style search interface |
-| Chat | Multi-turn AI conversation |
-| Discover | Trending topic cards |
-| Finance | Market & financial data view |
-| Profile | Edit profile settings |
-
----
-
+- **Google Auth Error 400 (origin_mismatch):** Ensure the Render domain is in Google Credentials' Authorized JavaScript Origins list.
+- **Database read-only errors:** Ensure the database folder `backend/database/` has read/write filesystem permissions on your hosting server.
+- **Production secret warnings:** The server will crash on launch in `production` mode if the default development JWT key is used. Set a strong custom secret.

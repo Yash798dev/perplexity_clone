@@ -2,6 +2,7 @@ import { Component, inject, signal, AfterViewInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-signup',
@@ -28,7 +29,7 @@ export class SignupComponent implements AfterViewInit {
     const googleObj = (window as any).google;
     if (googleObj && googleObj.accounts && googleObj.accounts.id) {
       googleObj.accounts.id.initialize({
-        client_id: '743853223633-kjgpu01ov24t09c3cln8p4om552vp7ik.apps.googleusercontent.com',
+        client_id: environment.googleClientId,
         callback: (response: any) => {
           if (response.credential) {
             this.isSubmitting.set(true);
@@ -50,37 +51,50 @@ export class SignupComponent implements AfterViewInit {
         }
       });
 
-      // Render the official Google Sign-In button in the placeholder container
       googleObj.accounts.id.renderButton(
         document.getElementById('googleBtn'),
         { theme: 'outline', size: 'large', width: 320 }
       );
     } else {
-      // Retry after a small delay if SDK hasn't finished loading
       setTimeout(() => this.initGoogleSignInButton(), 250);
     }
   }
 
   protected onSubmit(): void {
-    if (!this.email().trim() || !this.password() || !this.confirmPassword()) {
+    const emailVal = this.email().trim();
+    const passwordVal = this.password();
+    const confirmVal = this.confirmPassword();
+
+    if (!emailVal || !passwordVal || !confirmVal) {
       this.errorMessage.set('Please fill out all fields.');
       return;
     }
 
-    if (this.password() !== this.confirmPassword()) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailVal)) {
+      this.errorMessage.set('Please enter a valid email address.');
+      return;
+    }
+
+    if (passwordVal !== confirmVal) {
       this.errorMessage.set('Passwords do not match.');
       return;
     }
 
-    if (this.password().length < 6) {
-      this.errorMessage.set('Password must be at least 6 characters long.');
+    if (passwordVal.length < 8) {
+      this.errorMessage.set('Password must be at least 8 characters long.');
+      return;
+    }
+
+    if (passwordVal.length > 128) {
+      this.errorMessage.set('Password is too long (max 128 characters).');
       return;
     }
 
     this.errorMessage.set('');
     this.isSubmitting.set(true);
 
-    this.auth.signup(this.email().trim(), this.password()).subscribe({
+    this.auth.signup(emailVal, passwordVal).subscribe({
       next: () => {
         this.isSubmitting.set(false);
         this.router.navigate(['/onboarding']);

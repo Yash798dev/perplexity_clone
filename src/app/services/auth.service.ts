@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, catchError, throwError, of } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 
 export interface User {
@@ -19,6 +19,8 @@ interface AuthResponse {
   user: User;
 }
 
+const TOKEN_KEY = 'comet_token';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -27,7 +29,6 @@ export class AuthService {
   private router = inject(Router);
   private apiUrl = `${API_BASE_URL}/api/auth`;
 
-  // Signals
   readonly currentUser = signal<User | null>(null);
   readonly isLoading = signal(true);
   readonly isLoggedIn = computed(() => this.currentUser() !== null);
@@ -37,7 +38,7 @@ export class AuthService {
   }
 
   private initAuth(): void {
-    const token = localStorage.getItem('comet_token');
+    const token = sessionStorage.getItem(TOKEN_KEY);
     if (!token) {
       this.isLoading.set(false);
       return;
@@ -90,13 +91,13 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('comet_token');
+    sessionStorage.removeItem(TOKEN_KEY);
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
 
   private handleAuthSuccess(res: AuthResponse): void {
-    localStorage.setItem('comet_token', res.token);
+    sessionStorage.setItem(TOKEN_KEY, res.token);
     this.currentUser.set(res.user);
   }
 }

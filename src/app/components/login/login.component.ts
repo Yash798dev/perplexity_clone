@@ -2,6 +2,7 @@ import { Component, inject, signal, AfterViewInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -27,7 +28,7 @@ export class LoginComponent implements AfterViewInit {
     const googleObj = (window as any).google;
     if (googleObj && googleObj.accounts && googleObj.accounts.id) {
       googleObj.accounts.id.initialize({
-        client_id: '743853223633-kjgpu01ov24t09c3cln8p4om552vp7ik.apps.googleusercontent.com',
+        client_id: environment.googleClientId,
         callback: (response: any) => {
           if (response.credential) {
             this.isSubmitting.set(true);
@@ -49,27 +50,34 @@ export class LoginComponent implements AfterViewInit {
         }
       });
 
-      // Render the official Google Sign-In button in the placeholder container
       googleObj.accounts.id.renderButton(
         document.getElementById('googleBtn'),
         { theme: 'outline', size: 'large', width: 320 }
       );
     } else {
-      // Retry after a small delay if SDK hasn't finished loading
       setTimeout(() => this.initGoogleSignInButton(), 250);
     }
   }
 
   protected onSubmit(): void {
-    if (!this.email().trim() || !this.password()) {
+    const emailVal = this.email().trim();
+    const passwordVal = this.password();
+
+    if (!emailVal || !passwordVal) {
       this.errorMessage.set('Please fill out all fields.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailVal)) {
+      this.errorMessage.set('Please enter a valid email address.');
       return;
     }
 
     this.errorMessage.set('');
     this.isSubmitting.set(true);
 
-    this.auth.login(this.email().trim(), this.password()).subscribe({
+    this.auth.login(emailVal, passwordVal).subscribe({
       next: (res) => {
         this.isSubmitting.set(false);
         if (!res.user.isOnboarded) {
